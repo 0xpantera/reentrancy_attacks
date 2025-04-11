@@ -19,9 +19,9 @@ mod NFTMock {
 
     // ERC721
     #[abi(embed_v0)]
-    impl ERC721MixinImpl = ERC721Component::ERC721MixinImpl<ContractState>; // This component uses function_name notation
+    impl ERC721MixinImpl = ERC721Component::ERC721MixinImpl<ContractState>;
     
-    impl ERC721InternalImpl = ERC721Component::InternalImpl<ContractState>; // Component with internal functions
+    impl ERC721InternalImpl = ERC721Component::InternalImpl<ContractState>;
 
     #[storage]
     struct Storage {
@@ -43,7 +43,6 @@ mod NFTMock {
 
     #[constructor]
     fn constructor(ref self: ContractState, owner: ContractAddress) {
-        // You are free to choose the name and the symbol of the contract.
         let name = "MyNFT";
         let symbol = "NFT";
 

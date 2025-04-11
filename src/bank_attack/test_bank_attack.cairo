@@ -82,17 +82,15 @@ fn test_bank_attack() {
 
     // Deploy malicious contract >:|
     let (kid_address, kid_dispatcher) = deploy_the_kid(attacker, bank_address, eth_dispatcher);
-    println!("Kid address: {:?}", kid_address);
+    
     // Transfer attacker ETH to kid
     start_cheat_caller_address(eth_address, attacker);
     eth_dispatcher.transfer(kid_address, one_ether());
     stop_cheat_caller_address(eth_address);
     
-    let kid_balance = eth_dispatcher.balance_of(kid_address);
-    println!("The Sundance Kid balance is: {}", kid_balance);
+    let _kid_balance = eth_dispatcher.balance_of(kid_address);
 
-    let bank_balance_before_attack = eth_dispatcher.balance_of(bank_address);
-    println!("Bank balance before attack: {}", bank_balance_before_attack);
+    let _bank_balance_before_attack = eth_dispatcher.balance_of(bank_address);
 
     // Attacc
     start_cheat_caller_address(kid_address, attacker);

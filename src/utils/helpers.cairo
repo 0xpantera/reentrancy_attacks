@@ -35,7 +35,7 @@ pub fn deploy_eth() -> (ContractAddress, IERC20Dispatcher) {
     return (address, IERC20Dispatcher { contract_address: address });
 }
 
-fn deploy_nft() -> (ContractAddress, IERC721Dispatcher) {
+pub fn deploy_nft() -> (ContractAddress, IERC721Dispatcher) {
     // Declaring the contract class
     let contract_class = declare("NFTMock").unwrap().contract_class();
     // Creating the data to send to the constructor, first specifying as a default value
@@ -57,7 +57,7 @@ pub fn mint_erc20(token: ContractAddress, receiver: ContractAddress, amount: u25
     stop_cheat_caller_address(token);
 }
 
-fn mint_nft(nft: ContractAddress, receiver: ContractAddress, token_id: u256) {
+pub fn mint_nft(nft: ContractAddress, receiver: ContractAddress, token_id: u256) {
     let deployer: ContractAddress = 123.try_into().unwrap();
     let nft_dispatcher = IERC721MintableDispatcher { contract_address: nft };
     start_cheat_caller_address(nft, deployer);

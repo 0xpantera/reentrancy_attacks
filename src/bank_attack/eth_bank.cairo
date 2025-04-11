@@ -1,4 +1,3 @@
-// Library imports
 use starknet::ContractAddress;
 
 // Definition of interface of Bank
@@ -17,7 +16,6 @@ trait ICustomer<TContractState> {
 
 #[starknet::contract]
 mod Bank {
-    // Library imports
     use starknet::{get_contract_address, get_caller_address, ContractAddress};
     use openzeppelin_token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
     use super::{ICustomerDispatcher, ICustomerDispatcherTrait};
@@ -30,7 +28,6 @@ mod Bank {
         currency: IERC20Dispatcher, // The token to be used as currency
     }
 
-    // Constructor
     #[constructor]
     fn constructor(ref self: ContractState, currency: ContractAddress) {
         self.currency.write(IERC20Dispatcher { contract_address: currency });

@@ -3,8 +3,8 @@ use snforge_std::{
     start_cheat_caller_address, stop_cheat_caller_address,
 };
 use starknet::ContractAddress;
-use openzeppelin_token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
-use openzeppelin_token::erc721::interface::{IERC721Dispatcher, IERC721DispatcherTrait};
+use openzeppelin_token::erc20::interface::IERC20Dispatcher;
+use openzeppelin_token::erc721::interface::IERC721Dispatcher;
 
 #[starknet::interface]
 trait IERC20MintingAndBurning<TState> {
